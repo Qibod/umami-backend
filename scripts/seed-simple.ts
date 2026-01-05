@@ -91,7 +91,14 @@ function normalizeClassification(classification: string | null): string {
   return 'Junmai';
 }
 
-function extractBreweryInfo(manufacturerInfo: string) {
+function extractBreweryInfo(manufacturerInfo: string | undefined) {
+  if (!manufacturerInfo) {
+    return {
+      name_english: 'Unknown Brewery',
+      name_japanese: '不明な酒造',
+      description: 'Brewery information not available'
+    };
+  }
   const lines = manufacturerInfo.split('\n').filter(l => l.trim());
   const name = lines[0] || 'Unknown Brewery';
   return {
@@ -215,7 +222,7 @@ async function seedDatabase() {
         umami: flavorProfile.umami,
         aroma_intensity: flavorProfile.aromaIntensity,
         smv: sake.smv,
-        acidity_value: sake.acidity,
+        acidity_value: sake.acidity ? Math.min(sake.acidity, 9.99) : null,
         image_url: imageUrl,
         price: sake.price || 0,
         content: sake.content || '720ml',
